@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera and Image Viewer</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #cameraContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            relative: position;
+        }
+
+        #mediaElement {
+            flex: 1;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        #imageElement {
+            width: 50%;
+            height: auto;
+            object-fit: contain;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        #cameraButton,
+        #fileInputButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+      #transparencyRange {
+    width: 50%;
+    position: absolute;
+    bottom: 15%;
+    display: none
+}
+
+    </style>
+</head>
+<body>
+    <div id="cameraContainer">
+        <video id="mediaElement" autoplay></video>
+        <img id="imageElement">
+        <button id="cameraButton" onclick="openCamera()">فتح الكاميرا</button>
+        <button id="fileInputButton" onclick="openFileInput()">اختيار صورة</button>
+        <input type="file" id="fileInput" accept="image/*" onchange="displayImage(this)">
+        <input type="range" id="transparencyRange" value="100" max="100" onchange="changeTransparency()">
+    </div>
+
+    <script>
+        async function openCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                const mediaElement = document.getElementById('mediaElement');
+                const imageElement = document.getElementById('imageElement');
+                
+                mediaElement.srcObject = stream;
+                mediaElement.style.display = 'block';
+                imageElement.style.display = 'none';
+            } catch (error) {
+                console.error('Error accessing the camera:', error);
+            }
+        }
+
+        function openFileInput() {
+            const fileInput = document.getElementById('fileInput');
+            fileInput.click();
+        }
+
+        function displayImage(input) {
+    const file = input.files[0];
+    if (file) {
+        const mediaElement = document.getElementById('mediaElement');
+        const imageElement = document.getElementById('imageElement');
+        const transparencyRange = document.getElementById('transparencyRange');
+
+        mediaElement.style.display = 'block';
+        imageElement.src = URL.createObjectURL(file);
+        imageElement.style.display = 'block';
+        transparencyRange.style.display = 'block'; // أضف هذا السطر
+    }
+}
+
+
+        function changeTransparency() {
+            const imageElement = document.getElementById('imageElement');
+            const transparencyRange = document.getElementById('transparencyRange');
+            const transparencyValue = transparencyRange.value;
+            imageElement.style.opacity = transparencyValue / 100;
+        }
+    </script>
+</body>
+</html>
